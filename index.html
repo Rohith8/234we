@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Wallet Connect</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         /* Add your CSS styles here */
         body {
@@ -47,6 +48,14 @@
             right: 10px;
             cursor: pointer;
         }
+
+        #network-info {
+            margin-top: 20px;
+        }
+
+        #balance-info {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -56,51 +65,117 @@
         <div id="wallet-popup">
             <span id="close-modal">X</span>
             <h2>Connect Wallet</h2>
-            <button id="connect-wallet">Connect with MetaMask</button>
+            <button id="connect-metamask"><i class="fab fa-ethereum"></i> Connect with MetaMask</button>
+            <button id="connect-trustwallet"><i class="fab fa-ethereum"></i> Connect with Trust Wallet</button>
+            <button id="connect-manual"><i class="fab fa-btc"></i> Connect Manually (Bitcoin)</button>
+            <div id="network-info">
+                <strong>Network:</strong> <span id="network"></span>
+                <button id="change-network">Change Network</button>
+            </div>
+            <div id="balance-info">
+                <strong>Balance:</strong> <span id="balance"></span> ETH
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
     <script>
+        const web3 = new Web3(Web3.givenProvider || "https://mainnet.infura.io/v3/your-infura-api-key"); // Change this to your Infura API key or desired Ethereum network
+
         // Function to toggle the wallet modal
         function toggleModal() {
             const modal = document.getElementById('wallet-modal');
             modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
         }
 
-        // Function to connect the wallet
-        async function connectWallet() {
-            if (checkWallet()) {
+        // Function to connect with MetaMask
+        async function connectMetaMask() {
+            if (window.ethereum) {
                 try {
-                    // Request access to the user's wallet
                     await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    console.log("Wallet connected!");
-                    toggleModal();
+                    updateWalletInfo();
                 } catch (error) {
                     console.error(error);
                 }
             } else {
-                alert("MetaMask or Trust Wallet is not installed. Please install and try again.");
+                alert("MetaMask is not installed. Please install and try again.");
             }
         }
 
-        // Add a click event listener to the button
+        // Function to connect with Trust Wallet
+        async function connectTrustWallet() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: 'wallet_requestPermissions' });
+                    updateWalletInfo();
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                alert("Trust Wallet is not installed. Please install and try again.");
+            }
+        }
+
+        // Function to connect manually (Bitcoin)
+        function connectManual() {
+            // Implement Bitcoin wallet connection logic here
+            alert("Manually connecting to Bitcoin wallet.");
+        }
+
+        // Function to update wallet information
+        async function updateWalletInfo() {
+            const accounts = await web3.eth.getAccounts();
+            const networkId = await web3.eth.net.getId();
+            const networkName = getNetworkName(networkId);
+            const balance = await web3.eth.getBalance(accounts[0]);
+
+            document.getElementById('network').textContent = networkName;
+            document.getElementById('balance').textContent = web3.utils.fromWei(balance, 'ether');
+        }
+
+        // Function to get network name from network ID
+        function getNetworkName(networkId) {
+            // Add more networks as needed
+            switch (networkId) {
+                case 1:
+                    return "Mainnet";
+                case 3:
+                    return "Ropsten Testnet";
+                case 4:
+                    return "Rinkeby Testnet";
+                case 5:
+                    return "Goerli Testnet";
+                default:
+                    return "Unknown";
+            }
+        }
+
+        // Add event listeners
         const connectButton = document.getElementById('wallet-connect-button');
-        const connectModalButton = document.getElementById('connect-wallet');
+        const connectMetaMaskButton = document.getElementById('connect-metamask');
+        const connectTrustWalletButton = document.getElementById('connect-trustwallet');
+        const connectManualButton = document.getElementById('connect-manual');
         const closeModalButton = document.getElementById('close-modal');
+        const changeNetworkButton = document.getElementById('change-network');
 
         connectButton.addEventListener('click', toggleModal);
-        connectModalButton.addEventListener('click', connectWallet);
+        connectMetaMaskButton.addEventListener('click', connectMetaMask);
+        connectTrustWalletButton.addEventListener('click', connectTrustWallet);
+        connectManualButton.addEventListener('click', connectManual);
         closeModalButton.addEventListener('click', toggleModal);
+        changeNetworkButton.addEventListener('click', toggleModal);
 
         // Check if MetaMask or Trust Wallet is installed
         function checkWallet() {
             if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
-                // MetaMask or Trust Wallet is installed
                 return true;
             } else {
                 return false;
             }
         }
+
+        // Initialize wallet info
+        updateWalletInfo();
     </script>
 </body>
 </html>
