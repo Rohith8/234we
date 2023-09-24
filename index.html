@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Wallet Connect</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            text-align: right;
+        }
+
+        #wallet-connect-button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-right: 20px;
+        }
+
+        #wallet-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        #wallet-popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        #close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="wallet-connect-button">Connect Wallet</button>
+
+    <div id="wallet-modal">
+        <div id="wallet-popup">
+            <span id="close-modal">X</span>
+            <h2>Connect Wallet</h2>
+            <button id="connect-wallet">Connect with MetaMask</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle the wallet modal
+        function toggleModal() {
+            const modal = document.getElementById('wallet-modal');
+            modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        }
+
+        // Function to connect the wallet
+        async function connectWallet() {
+            if (checkWallet()) {
+                try {
+                    // Request access to the user's wallet
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    console.log("Wallet connected!");
+                    toggleModal();
+                } catch (error) {
+                    console.error(error);
+                }
+            } else {
+                alert("MetaMask or Trust Wallet is not installed. Please install and try again.");
+            }
+        }
+
+        // Add a click event listener to the button
+        const connectButton = document.getElementById('wallet-connect-button');
+        const connectModalButton = document.getElementById('connect-wallet');
+        const closeModalButton = document.getElementById('close-modal');
+
+        connectButton.addEventListener('click', toggleModal);
+        connectModalButton.addEventListener('click', connectWallet);
+        closeModalButton.addEventListener('click', toggleModal);
+
+        // Check if MetaMask or Trust Wallet is installed
+        function checkWallet() {
+            if (typeof window.ethereum !== 'undefined' || (typeof window.web3 !== 'undefined')) {
+                // MetaMask or Trust Wallet is installed
+                return true;
+            } else {
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>
