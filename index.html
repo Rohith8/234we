@@ -3,57 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BSC Wallet Connect</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
         }
-
-        button {
+        .wallet-button {
+            background-color: #42b983;
+            color: red;
             padding: 10px 20px;
-            font-size: 16px;
+            border: none;
+            cursor: pointer;
         }
-
-        #walletAddress {
-            font-size: 18px;
-            margin-top: 10px;
-            display: none;
+        .wallet-button:hover {
+            background-color: #36a77e;
         }
     </style>
-    <title>BSC Wallet Connect</title>
 </head>
 <body>
-    <button id="connectButton">Connect Wallet</button>
-    <div id="walletAddress"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.6/web3.min.js"></script>
+    <h1>BSC Wallet Connect</h1>
+    <button id="connectWalletButton" class="wallet-button">Connect Wallet</button>
+    <p id="walletAddress"></p>
+    <p id="walletBalance"></p>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
     <script>
-        window.addEventListener('load', async () => {
-            if (window.ethereum) {
-                window.web3 = new Web3(window.ethereum);
+        // Initialize Web3.js
+        let web3;
 
-                try {
-                    // Request access to the BSC wallet
-                    await window.ethereum.enable();
+        if (typeof window.ethereum !== 'undefined') {
+            web3 = new Web3(window.ethereum);
+        } else {
+            alert('Please install a BSC wallet extension like MetaMask.');
+        }
 
-                    // Get the selected account address
-                    const accounts = await window.web3.eth.getAccounts();
-                    const walletAddress = accounts[0];
+        // Function to connect the wallet
+        async function connectWallet() {
+            try {
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await web3.eth.getAccounts();
+                const address = accounts[0];
+                const balance = await web3.eth.getBalance(address);
 
-                    // Display the wallet address
-                    const walletAddressElement = document.getElementById('walletAddress');
-                    walletAddressElement.innerHTML = `Connected Wallet: ${walletAddress}`;
-                    walletAddressElement.style.display = 'block';
-
-                    // Disable the connect button
-                    document.getElementById('connectButton').disabled = true;
-                } catch (error) {
-                    console.error(error);
-                }
-            } else {
-                alert('Please install a BSC wallet like MetaMask to use this feature.');
+                // Display the wallet address and balance
+                document.getElementById('walletAddress').textContent = `Connected Address: ${address}`;
+                document.getElementById('walletBalance').textContent = `Balance: ${web3.utils.fromWei(balance, 'ether')} BNB`;
+            } catch (error) {
+                console.error(error);
             }
-        });
+        }
+
+        // Add a click event listener to the Connect Wallet button
+        document.getElementById('connectWalletButton').addEventListener('click', connectWallet);
     </script>
 </body>
 </html>
