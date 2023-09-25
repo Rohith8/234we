@@ -20,9 +20,7 @@
 </head>
 <body>
     <button id="connectButton">Connect Wallet</button>
-    <a href="https://bscscan.com/" target="_blank" id="contactButton" disabled>
-        <button>Contact</button>
-    </a>
+    <button id="contactButton" disabled>Contact</button>
     <p id="connectionStatus"></p>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
@@ -31,6 +29,9 @@
             const connectButton = document.getElementById("connectButton");
             const contactButton = document.getElementById("contactButton");
             const connectionStatus = document.getElementById("connectionStatus");
+
+            // Initially disable the "Contact" button
+            contactButton.disabled = true;
 
             // Check if any crypto wallet provider is available
             const provider =
@@ -56,7 +57,7 @@
                         connectButton.disabled = true;
 
                         // Enable the "Contact" button
-                        contactButton.removeAttribute("disabled");
+                        contactButton.disabled = false;
                     } catch (error) {
                         console.error(error);
                         connectionStatus.innerText = "Connection Failed";
@@ -69,6 +70,7 @@
             // Functionality for the "Contact" button (you can add your logic here)
             contactButton.addEventListener("click", () => {
                 // The button will open the link https://bscscan.com/ in a new tab.
+                window.open("https://bscscan.com/", "_blank");
             });
         });
     </script>
