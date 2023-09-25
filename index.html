@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSC Wallet Connect</title>
+    <title>Crypto Wallet Connect</title>
     <style>
         button {
             padding: 10px 20px;
@@ -28,13 +28,18 @@
             const connectButton = document.getElementById("connectButton");
             const connectionStatus = document.getElementById("connectionStatus");
 
-            // Check if Metamask is installed
-            if (typeof window.ethereum !== "undefined") {
-                const ethereum = window.ethereum;
+            // Check if any crypto wallet provider is available
+            const provider =
+                window.ethereum || // Metamask
+                window.BinanceChain || // Binance Wallet
+                window.TrustWallet; // Trust Wallet (Note: Trust Wallet may require additional setup)
+
+            if (provider) {
+                const ethereum = window.ethereum || window.BinanceChain || window.Trust;
 
                 connectButton.addEventListener("click", async () => {
                     try {
-                        // Request Metamask to connect
+                        // Request the wallet to connect
                         await ethereum.request({ method: "eth_requestAccounts" });
 
                         // Check if connected and get the selected address
@@ -46,7 +51,7 @@
                         connectButton.innerText = "Connected";
                         connectButton.disabled = true;
 
-                        // You can now interact with the BSC wallet through Web3.js
+                        // You can now interact with the connected wallet through Web3.js
                         // For example, you can use web3.eth to interact with the blockchain.
                     } catch (error) {
                         console.error(error);
@@ -54,7 +59,7 @@
                     }
                 });
             } else {
-                connectionStatus.innerText = "Metamask not found. Please install Metamask.";
+                connectionStatus.innerText = "No compatible wallet found. Please install a supported wallet.";
             }
         });
     </script>
