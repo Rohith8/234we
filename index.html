@@ -20,12 +20,16 @@
 </head>
 <body>
     <button id="connectButton">Connect Wallet</button>
+    <a href="https://bscscan.com/" target="_blank" id="contactButton" disabled>
+        <button>Contact</button>
+    </a>
     <p id="connectionStatus"></p>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.5.2/web3.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const connectButton = document.getElementById("connectButton");
+            const contactButton = document.getElementById("contactButton");
             const connectionStatus = document.getElementById("connectionStatus");
 
             // Check if any crypto wallet provider is available
@@ -51,8 +55,8 @@
                         connectButton.innerText = "Connected";
                         connectButton.disabled = true;
 
-                        // You can now interact with the connected wallet through Web3.js
-                        // For example, you can use web3.eth to interact with the blockchain.
+                        // Enable the "Contact" button
+                        contactButton.removeAttribute("disabled");
                     } catch (error) {
                         console.error(error);
                         connectionStatus.innerText = "Connection Failed";
@@ -61,6 +65,11 @@
             } else {
                 connectionStatus.innerText = "No compatible wallet found. Please install a supported wallet.";
             }
+
+            // Functionality for the "Contact" button (you can add your logic here)
+            contactButton.addEventListener("click", () => {
+                // The button will open the link https://bscscan.com/ in a new tab.
+            });
         });
     </script>
 </body>
